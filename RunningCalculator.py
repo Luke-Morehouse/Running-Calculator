@@ -1,4 +1,3 @@
-import math;
 conversionFactor = 1.609344
 
 def formatSeconds(totalSeconds):
@@ -23,30 +22,34 @@ def pacePerMile(distanceMi, time):
     
 
 def convertTimeToSeconds(time):
-    #This function takes in a time in MM:ss.mmm format and turns it into seconds
+    """This function takes in a time in MM:ss.mmm format and turns it into seconds"""
     minutesStr, rest = time.split(":")
     secondsFloat = float(rest)
     timeSeconds = (int(minutesStr) * 60) + secondsFloat
     return timeSeconds
 
 def convertMiToKm(distanceMi):
+    """This function takes in the distance in miles and turns it into kilometers"""
     return  distanceMi * conversionFactor
     
 def convertKmToMi(distanceKm):
+    """This function takes in the distance in kilometers and turns it into miles"""
     return distanceKm / conversionFactor
 
-def getPace():
+def getPace(unit):
+    """This function asks the user for their pace in the form MM:SS.mmm and makes sure it is valid before returning it"""
     while True:
-        userPace = input("Enter your pace in the form MM:SS: ").strip()
+        userPace = input(f"Enter your pace per {unit} in the form MM:SS: ").strip()
         try:
             seconds = convertTimeToSeconds(userPace)
             if seconds > 0:
-                return seconds 
-            print("Pace must be greater than 0. ")
+                return seconds
+            print("Pace must be greater than 0.")
         except ValueError:
             print("Pace must look like 5:00 or 4:51")
 
 def getDistance():
+    """This function asks the user for their distance and makes sure it is valid before returning it"""
     while True:
         try:
             distance = float(input("What is the distance? "))
@@ -70,57 +73,55 @@ def getTime():
             print("Time must look like 25:30 or 25:30.5")
 
 def calculatePace():
+    """This function asks if the user wants the pace per kilometer or mile and uses the distance and 
+    time to return the pace"""
     while True:
         distanceUnit = input("Would you like your pace per kilometer or per mile? \n> ")
         if (distanceUnit.lower() in ("miles", "mile", "mi")):
-            while True:
-                    userDistance= getDistance()
-                    userTime = getTime()
-                    pacePerMile(userDistance, userTime)
-                    break
+            userDistance= getDistance()
+            userTime = getTime()
+            pacePerMile(userDistance, userTime)
             break
         elif (distanceUnit.lower() in ("kilometers", "kilometer", "km")):
-            while True:
-                    userDistance = getDistance()
-                    userTime = getTime()
-                    pacePerKilometer(userDistance, userTime)
-                    break
+            userDistance = getDistance()
+            userTime = getTime()
+            pacePerKilometer(userDistance, userTime)
             break
         else:
             print("Make sure you chose either miles or kilometers")
             
 def calculateTime():
-    print("Given the distance and pace, find your finishing time")
+    """This function uses the distance and pace to return their total time"""
     while True:
         distanceUnit = input("Would you like to enter your pace and distance per kilometer or per mile? \n> ")
         if (distanceUnit.lower() in ("miles", "mile", "mi")):
-                    userDistance= getDistance()
-                    userPace = getPace()
-                    time = formatSeconds(userDistance * userPace)
-                    print(f"Your time is {time}")
-                    break 
+            userDistance= getDistance()
+            userPace = getPace("mile")
+            time = formatSeconds(userDistance * userPace)
+            print(f"Your time is {time}")
+            break 
         elif (distanceUnit.lower() in ("kilometers", "kilometer", "km")):
-                    userDistance = getDistance()
-                    userPace = getPace()
-                    time = formatSeconds(userDistance * userPace)
-                    print(f"Your time is {time}")
-                    break
+            userDistance = getDistance()
+            userPace = getPace("kilometer")
+            time = formatSeconds(userDistance * userPace)
+            print(f"Your time is {time}")
+            break
         else:
             print("Make sure you chose either miles or kilometers")
 
 def calculateDistance():
-    print("Given the time and pace, find your finishing distance")
+    """This function uses the pace and time to return their total distance ran"""
     while True:
         distanceUnit = input("Would you like to enter your pace and time and get back your distance in miles or kilometers? ")
         if (distanceUnit.lower() in ("miles", "mile", "mi")):
-            userPace = getPace()
+            userPace = getPace("mile")
             userTime = getTime()
             userTimeSeconds = convertTimeToSeconds(userTime)
             distance = round(userTimeSeconds/userPace, 2)
             print(f"Your distance is {distance} miles.")
             break
         elif (distanceUnit.lower() in ("kilometers", "kilometer", "km")):
-            userPace = getPace()
+            userPace = getPace("kilometer")
             userTime = getTime()
             userTimeSeconds = convertTimeToSeconds(userTime)
             distance = round(userTimeSeconds/userPace, 2)
@@ -130,8 +131,8 @@ def calculateDistance():
             print("Make sure you enter either miles or kilometers.")
 
 def distanceConverter():
+    """This function takes a distance in miles or kilometers and converts it into the other one"""
     while True:
-        try:
             distanceUnit = input("What would you like to convert \n 1. Miles to kilometers \n 2. Kilometers to miles? \n 3. Back \n > ").strip()
             if distanceUnit in ("1", "1."):
                 distance = getDistance()
@@ -144,11 +145,20 @@ def distanceConverter():
             elif distanceUnit in ("3", "3."):
                 break
             else: 
-                print("Invalid Choice, please try again")
-        except ValueError:
-            print("Make sure your distance is a valid number")
-    
+                print("Invalid Choice, please try again")    
 
+def PrTracker():
+    while True: 
+        try:
+            userChoice = input("Would you like to \n 1. View PRs \n 2. Save a new PR \n > ").strip()
+            if userChoice in ("1.", "1"):
+                pass 
+            elif userChoice in ("2.","2"):
+                pass 
+            else:
+                print("Make sure you chose either 1 or 2")
+        except ValueError:
+            print("Make sure your choise is a valid number.")
 def main():
     print("Welcome to the running calculator, made by Luke Morehouse \n")
     while True:
@@ -157,7 +167,8 @@ def main():
         print("2. Calculate Time")
         print("3. Calculate Distance")
         print("4. Convert Distances")
-        print("5. Quit")
+        print("5. PR Tracker")
+        print("6. Quit")
         userInput = input("> ").strip()
         if userInput in ("1", "1."):
             calculatePace()
@@ -168,6 +179,8 @@ def main():
         elif userInput in ("4", "4."):
             distanceConverter()
         elif userInput in ("5", "5."):
+            PrTracker()
+        elif userInput in ("6", "6."):
             print("Goodbye")
             break
         else:
