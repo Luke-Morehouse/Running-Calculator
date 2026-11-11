@@ -1,4 +1,8 @@
 conversionFactor = 1.609344
+PR_DISTANCES = ["60m", "100m", "100mh", "110mh", "200m", "300mh", "400m", "400mh",
+                "800m", "1k", "1500m", "1600m", "mile",
+                "3k", "3k-steeplechase", "3200m", "2-mile", "5k", "8k", "10k",
+                "half-marathon", "marathon"]
 
 def formatSeconds(totalSeconds):
     """Turn seconds into M:SS or M:SS.mmm, trimming unneeded trailing zeros."""
@@ -147,18 +151,85 @@ def distanceConverter():
             else: 
                 print("Invalid Choice, please try again")    
 
+def viewPrs():
+    try:
+        with open("prs.txt", "r") as file:
+            foundPR = False
+            for line in file:
+                if line.strip() == "":
+                    continue
+                distance, seconds = line.strip().split(",")
+                print(f"{distance} - {formatSeconds(float(seconds))}")
+                foundPR = True
+            if foundPR == False:
+                print("You have not saved any PR's yet, go back and chose number 2 to save a PR")
+    except FileNotFoundError:
+        print("You have not saved any PR's yet, go back and chose number 2 to save a PR")
+
+def loadPrs():
+    records = {}
+    try:
+        with open("prs.txt", "r") as file:
+            for line in file:
+                if line.strip() == "":
+                    continue
+                distance, seconds = line.strip().split(",")
+                records[distance] = float(seconds)
+    except FileNotFoundError:
+        pass 
+    return records
+
+def savePrs(records):
+    """Takes in the records dictionary and rewrites the whole file so that you can update PR's"""
+    with open("prs.txt", "w") as file:
+        for distance, seconds in records.items():
+            file.write(f"{distance},{seconds}\n")
+
+def deletePR():
+    records = loadPrs()
+    userInput = input("Which PR would you like to delete, your options are \n Sprints: 60m, 100m, 100mH, 110mH, 200m, 300mH, 400m, 400mH, \n Mid distance: 800m, 1k, 1500m, 1600m, mile \n Distance: 3k, 3k-steeplechase, 3200m, 2-mile, 5k, 8k, 10k, half-marathon, marathon \n when you are finished type 'back' \n > ").strip().lower()
+    if userInput not in records:
+        print("You have not saved a PR for that distance.")
+    else:
+        while True:
+            yesNo = input("Are you sure you want to delete it: y/n? or type back").lower()
+            if yesNo == "y":
+                records.pop(userInput)
+                savePrs(records)
+                break
+            elif yesNo == "n" or yesNo == "back":
+                break
+            else:
+                print("Make sure you input either y or n")
 def PrTracker():
     while True: 
-        try:
-            userChoice = input("Would you like to \n 1. View PRs \n 2. Save a new PR \n > ").strip()
-            if userChoice in ("1.", "1"):
-                pass 
-            elif userChoice in ("2.","2"):
-                pass 
-            else:
-                print("Make sure you chose either 1 or 2")
-        except ValueError:
-            print("Make sure your choise is a valid number.")
+        userChoice = input("Would you like to \n 1. View PRs \n 2. Save a new PR \n 3. Delete a PR \n 4. Back\n > ").strip()
+        if userChoice in ("1.", "1"):
+           viewPrs()
+        elif userChoice in ("2.","2"):
+            records = loadPrs()
+            while True:
+                distance = input("What distance would you like to add a PR for, your options are \n Sprints: 60m, 100m, 100mH, 110mH, 200m, 300mH, 400m, 400mH, \n Mid distance: 800m, 1k, 1500m, 1600m, mile \n Distance: 3k, 3k-steeplechase, 3200m, 2-mile, 5k, 8k, 10k, half-marathon, marathon \n when you are finished type 'back' \n > ").strip().lower()
+                if distance == "back":
+                    break
+                if distance in PR_DISTANCES:
+                    time = getTime()
+                    timeSeconds = convertTimeToSeconds(time)
+                    if (distance not in records) or (records[distance] > timeSeconds):
+                        records[distance] = timeSeconds
+                        print(f"New PR in the {distance}!")
+                        savePrs(records)
+                    elif records[distance] <= timeSeconds:
+                        print("That time is not faster than your PR")
+                else:
+                    print("Make sure your distance is exactly the same as one of the options")
+        elif userChoice in ("3.","3"):
+            deletePR()
+        elif userChoice in ("4.","4"):
+            break
+        else:
+            print("Make sure you chose either 1, 2, 3, or 4")
+
 def main():
     print("Welcome to the running calculator, made by Luke Morehouse \n")
     while True:
